@@ -1,0 +1,9 @@
+# 已归档会话清理（dsh-archived-chat-cleanup）
+#
+# 插入两个入口共用的一个插件行：
+#   - Host 半（index.js）注册 `archivedCleanup` Remote 命名空间与
+#     `delete_archived_session` 工具，并负责落盘删除与事务回滚；
+#   - Client 半（client.js）在会话「...」菜单里加"删除已归档会话 / 清理全部已归档"两行。
+- insert:
+    - id: archived-chat-cleanup
+      name: dsh-archived-chat-cleanup

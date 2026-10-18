@@ -1,0 +1,4 @@
+{
+  "title": "Archived session cleanup",
+  "description": "Delete archived sessions: cascades subagent sessions, reclaims reference-free attachments and the request-images cache, all as one reversible transaction."
+}

@@ -1,0 +1,69 @@
+{
+  "name": "dsh-archived-chat-cleanup",
+  "version": "1.0.0",
+  "description": "Delete archived DSH sessions with reference-aware attachment garbage collection, as one reversible transaction.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Htao-uu",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "dsh-plugin",
+    "session",
+    "cleanup",
+    "attachments",
+    "archived-sessions"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Htao-uu/dsh-archived-chat-cleanup.git"
+  },
+  "homepage": "https://github.com/Htao-uu/dsh-archived-chat-cleanup#readme",
+  "bugs": {
+    "url": "https://github.com/Htao-uu/dsh-archived-chat-cleanup/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "core.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "locale"
+  ],
+  "scripts": {
+    "test": "node test/engine.test.mjs && node test/remote.test.mjs"
+  },
+  "devDependencies": {
+    "@deepseek-ai/dsh-typert-protocol": "^0.2.1-rc.2"
+  },
+  "meta": {
+    "title": "已归档会话清理",
+    "description": "删除已归档会话：级联子代理会话、按引用回收附件与 request-images 派生缓存，全程事务化可回滚。"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-workspace",
+        "@deepseek-ai/dsh-client-connection"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
