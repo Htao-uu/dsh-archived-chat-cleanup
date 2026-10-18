@@ -88,39 +88,8 @@ DSH 自身没有删除会话的 API（`sessionPersistence` / `attachments` 都�
 
 ## 路径与数据
 
-全部从活服务解析，不猜路径：
-
 - 会话根：`ctx.sessionPersistence.root`（回退：Loader 配置 / `DSH_HOME/sessions`）
 - 附件根：`ctx.attachments.root`（回退 `DSH_HOME/attachments/v1`）
 - 派生缓存：`ctx.attachments.cacheRoot`（回退 `DSH_HOME/cache/attachments`）
 - 插件数据：`DSH_HOME/plugin-data/archived-cleanup/`（`transactions/` journal，`reports/` 执行报告）
 
-## 实现要点（为什么这么写）
-
-- **不 import 任何 Harness 包**：浏览器半用 `ctx.get('connection').rpc.call('/api', 'archivedCleanup/xxx', { args })`；
-  Host 半用**手写的 Typert source-mode 描述符**（原型上的
-  `'@deepseek-ai/dsh-typert-protocol/remote-methods'` = `{ version: 1, methods: [...] }`）
-  加 `ctx.provide('archivedCleanup', service)`，Gateway 的 SRC 回退会用方法参数名做 wire 字段名。
-- **不新增会话事件类型**，不给会话日志写入任何东西。
-- 引擎 `core.js` 与框架解耦，Host 半只做能力适配，因此可以在临时夹具上完整跑验收测试。
-
-## 测试
-
-```
-node test/engine.test.mjs     # 54 项断言：核心引擎（合成夹具，不碰真实数据）
-node test/remote.test.mjs     # 19 项断言：用真实协议包校验 Remote wire 契约
-```
-
-`engine.test.mjs` 覆盖四条验收标准（独占附件被删 / 共享附件保留 / 非归档拒绝 / 失败回滚）
-以及级联、崩溃恢复、live 跳过、fail-closed、空归档 no-op、request-images 清理、file-alias 保留等。
-
-## 真实数据验证记录（2026-09-27，本机 web profile）
-
-- `dry_run` `mode:"all"`：6 个归档会话中跳过 2 个运行中的，其余 4 个共 4.23 MB；
-  引用附件 5 个、与 53 个存活会话**零共享**、可删 741 KB；`request-images` 两处缓存当时为空 → `caches: []`。
-- `mode:"one"` 指向非归档会话 → `session-not-archived`（未触碰任何文件）。
-- `mode:"one"` 指向运行中的归档会话 → `target-live`。
-- 浏览器侧：`sidebar.workspaces.session.menu.item` 里注册了两行（order 500/501，`active`）。
-
-> 安装/升级说明：DSH 的模块缓存按**包说明符**生效，替换已安装包的 JS 需要重启宿主
-> （`plugin_manager` 会返回 `restart-required`）。
